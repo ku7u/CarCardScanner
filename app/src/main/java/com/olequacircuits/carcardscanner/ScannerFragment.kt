@@ -1,5 +1,8 @@
 package com.olequacircuits.carcardscanner
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -7,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +22,10 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import androidx.camera.core.ExperimentalGetImage
-
 
 
 class ScannerFragment : Fragment() {
@@ -87,7 +89,19 @@ class ScannerFragment : Fragment() {
         )
 
         spinner.adapter = adapter
-        startCamera()
+//        startCamera()
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            startCamera()
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.CAMERA),
+                100
+            )
+        }
 
         toneGenerator =
             ToneGenerator(
@@ -100,6 +114,7 @@ class ScannerFragment : Fragment() {
                 .getSystemService(Context.VIBRATOR_SERVICE)
                     as Vibrator
     }
+
     @OptIn(ExperimentalGetImage::class)
     private fun startCamera() {
         val cameraProviderFuture =
@@ -208,18 +223,42 @@ class ScannerFragment : Fragment() {
                 }
             }
 
+            try {
+                cameraProvider.unbindAll()
 
-            cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    viewLifecycleOwner,
+                    CameraSelector.DEFAULT_BACK_CAMERA,
+                    preview,
+                    analysis
+                )
 
+                Log.d("CAMERA", "bindToLifecycle succeeded")
 
-            cameraProvider.bindToLifecycle(
-                viewLifecycleOwner,
-                CameraSelector.DEFAULT_BACK_CAMERA,
-                preview,
-                analysis
-            )
+            } catch (e: Exception) {
 
+                Log.e("CAMERA", "bindToLifecycle FAILED", e)
+            }
 
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(
+            requestCode,
+            permissions,
+            grantResults
+        )
+
+        if (requestCode == 100 &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            startCamera()
+        }
     }
 }
