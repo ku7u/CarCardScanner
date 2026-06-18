@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+
+    <Spinner
+        android:id="@+id/spLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"/>
+<!--        android:layout_weight="1"/>-->
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scanned Cars: 0"/>
+
+    <TextView
+        android:id="@+id/tvLastScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Scan:"/>
+
+    <TextView
+        android:id="@+id/tvScannedCars"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:text=""
+        android:scrollbars="vertical"/>
+
+    <Button
+        android:id="@+id/btnGenerate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Generate Switchlists"/>
+
+</LinearLayout>
