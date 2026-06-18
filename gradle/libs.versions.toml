@@ -13,6 +13,7 @@ coreKtxVersion = "1.19.0"
 #ksp = "2.4.0-2.0.2"
 kotlin = "2.0.21"
 ksp = "2.0.21-1.0.28"
+materialVersion = "1.14.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,6 +25,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtxVersion" }
+google-material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
