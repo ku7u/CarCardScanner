@@ -1,0 +1,173 @@
+CAD,Passenger,C,"Combined Car, Baggage and Pass",12
+CBS,Passenger,C,Baggage-Dormitory Car,12
+CO,Passenger,C,"Combined pass, baggage & mail",12
+CS,Passenger,C,Combined smoking & baggage,12
+CSA,Passenger,C,"Combined baggage, dorm & kit",12
+CSP,Passenger,C,"Mail or bag, dorm and pass",12
+DA,Passenger,D,Dining car,12
+DB,Passenger,D,Buffet car,12
+DC,Passenger,D,Cafe car,12
+DCL,Passenger,D,Lunch counter lounge,12
+DD,Passenger,D,Diner dormitory car,12
+DE,Passenger,D,Dining car,12
+DG,Passenger,D,Grill room car,12
+DK,Passenger,D,Dormitory kitchen car,12
+DKP,Passenger,D,Kitchen-car,12
+DL,Passenger,D,Buffet-lounge car,12
+DLC,Passenger,D,Lunch counter car,12
+DO,Passenger,D,Cafe observation car,12
+DP,Passenger,D,Dining and parlor car,12
+DPA,Passenger,D,Diner-lounge,12
+FA,Freight,F,Auto rack car,8
+FB,Freight,F,Bulkhead flat car,8
+FBC,Freight,F,Flat car with center beam,8
+FC,Freight,F,Flat Car TOFC,8
+FCA,Freight,F,"Flat car, articulated",8
+FD,Freight,F,"Flat car, Depressed center",12
+FG,Freight,F,Flat or gun car,8
+FL,Freight,F,Flat logging car or truck,8
+FM,Freight,F,"Flat Car, standard",8
+FMS,Freight,F,Auto rack car,8
+FP,Freight,F,"Flat car, pulpwood",8
+FT,Freight,F,"Flat car, illuminating gas",8
+FW,Freight,F,Flat well-hole car,8
+GA,Freight,G,Gondola drop bottom,8
+GB,Freight,G,"Gondola, standard",8
+GBS,Freight,G,"Gondola, coil steel car",8
+GBSR,Freight,G,"Gondola, coil steel car",8
+GC,Freight,G,"Gondola, Coke Car",8
+GD,Freight,G,"Gondola, side dump",8
+GDA,Freight,G,"Gondola, side dump",8
+GE,Freight,G,"Gondola, coal or mill trade",8
+GF,Freight,G,"Gondola, coke racks",8
+GH,Freight,G,"Gondola, center sill doors",8
+GK,Freight,G,"Gondola, standard",8
+GKA,Freight,G,"Gondola, standard",8
+GM,Freight,G,"Gondola, standard",8
+GMA,Freight,G,"Gondola, standard",8
+GP,Freight,G,"Gondola, pulpwood",8
+GR,Freight,G,"Gondola, hopper dump",8
+GRA,Freight,G,"Gondola, hopper dump",8
+GS,Freight,G,"Gondola, general service",8
+GT,Freight,G,"Gondola, high side",8
+GW,Freight,G,"Gondola, well-hole car",8
+HC,Freight,H,"Hopper, coke racks",8
+HD,Freight,H,"Hopper, side dump",8
+HDA,Freight,H,"Hopper, self- clearing car",8
+HE,Freight,H,"Hopper, not self-clearing",8
+HF,Freight,H,"Hopper, fixed sides and ends",8
+HFA,Freight,H,"Hopper, self-clearing",8
+HFB,Freight,H,"Hopper, self-clearing",8
+HK,Freight,H,"Hopper, self-clearing",8
+HM,Freight,H,"Hopper, 2 bay standard",8
+HMA,Freight,H,"Hopper, 2 bay",8
+HMB,Freight,H,"Hopper, 2 bay",8
+HT,Freight,H,Hopper 3/4 bay,8
+HTA,Freight,H,"Hopper, 3/4 bay",8
+HTB,Freight,H,"Hopper, 3/4 bay",8
+LB,Freight,L,"Box car, special divided doors",8
+LC,Freight,L,Box car with roof hatches,8
+LF,Freight,L,"Flat car, non-COFC containers",8
+LFA,Freight,L,"Flat car, prod in liquid/gas",8
+LFR,Freight,L,"Flat car, refrig'ed containers",8
+LG,Freight,L,"Gondola, non-COFC containers",8
+LM,Freight,L,AirJet car,8
+LO,Freight,L,Covered hopper car,0
+LOA,Freight,L,"Hopper, Covered Airslide",8
+LOC,Freight,L,"Covered hopper, carbon black",8
+LP,Freight,L,Pulpwood car,0
+LRC,Freight,L,"Box car, insulated car",8
+LS,Freight,L,Special car,8
+LT,Freight,L,"Tank car, grandular loads",8
+LTA,Freight,L,"Tank car, grandular solids",8
+LU,Freight,L,"Box car, all door car",8
+MA,Passenger,M,Postal car for US mail,12
+MB,Passenger,M,Baggage and mail,12
+MBD,Passenger,M,"Mail, baggage and dorm car",12
+MBE,Passenger,M,"Baggage, mail & express car",12
+MD,Passenger,M,Mail and dormitory car,12
+MP,Passenger,M,Postal car,12
+MR,Passenger,M,Postal storage car,12
+MS,Passenger,M,Mail and smoker car,12
+MWB,Freight,M,Ballast car,8
+MWD,Freight,M,"Dump car, rock/fille material",8
+NE,Non-Revenue,N,Caboose,8
+NM,Freight,N,Caboose,4
+PA,Passenger,P,Passenger car,12
+PAS,Passenger,P,Coach-sleeping car,12
+PB,Passenger,P,Coach or chair car,12
+PBC,Passenger,P,Parlor coach,12
+PBO,Passenger,P,Coach - obervation,12
+PC,Passenger,P,"Passenger, Parlor or Chair Car",12
+PD,Passenger,P,Tavern car,12
+PDS,Passenger,P,Sleeper / tavern car,12
+PE,Passenger,P,Emigrant or colonist car,12
+PL,Passenger,P,Lounge car,12
+PO,Passenger,P,Observation car,12
+PS,Passenger,P,Sleeping car,12
+PSA,Passenger,P,Dormitory car,12
+PT,Passenger,P,Tourist car,12
+PV,Passenger,P,Private car,12
+RA,Freight,R,"Reefer, brine-tank",8
+RB,Freight,R,"Reefer, beer car",8
+RBL,Freight,R,"Reefer, insulated",0
+RC,Freight,R,"Reefer, Insulated - dry ice",8
+RCD,Freight,R,"Reefer, with dry ice",8
+RLO,Freight,R,"Covered hopper, refrig",8
+RM,Freight,R,"Reefer, ice bunkers",8
+RP,Freight,R,"Reefer, mechanical",0
+RPA,Freight,R,"Reefer, mechanical",8
+RPB,Freight,R,"Reefer, elect mechanical",8
+RPC,Freight,R,"Reefer, container-mech",8
+RPL,Freight,R,"Reefer, mech & load dev",8
+RS,Freight,R,"Reefer, standard refrigerator",8
+RSTC,Freight,R,"Reefer, ice bunkers & fan",8
+RSTM,Freight,R,"Reefer, beef rails",8
+RT,Freight,R,"Reefer, milk car",8
+SA,Freight,S,"Stock car, live stock",8
+SC,Freight,S,"Stock car, convertible",0
+SD,Freight,S,"Stock car, drop doors",8
+SF,Freight,S,"Stock car, fixed double deck",8
+SH,Freight,S,"Stock car, horses",8
+SM,Freight,S,"Stock car, single or dbl deck",0
+SP,Freight,S,"Stock car, poultry",8
+SPR,Freight,S,"Stock, live & dressed poultry",8
+ST,Freight,S,"Stock car, triple deck",8
+TA,Freight,T,"Tank car, acid",0
+TG,Freight,T,"Tank car, mineral water",8
+TGB,Freight,T,"Tank car, 2 insulated tank",8
+TL,Freight,T,"Tank car, lead lined acid",8
+TM,Freight,T,"Tank car, general service",8
+TMI,Freight,T,"Tank car, gasoline-insulated",8
+TMN,Freight,T,"Tank car, non-regulatory",8
+TMU,Freight,T,"Tank car, chlorine, hydrogen",8
+TP,Freight,T,"Tank car, pressure tank",8
+TPA,Freight,T,"Tank car, alum pressure tank",8
+TR,Freight,T,"Tank car, aluminum tank",8
+TS,Freight,T,"Tank car, special service",8
+TVI,Freight,T,"Tank car, double-shell",8
+TW,Freight,T,"Tank car, vinegar, pickles",8
+VA,Freight,V,"Box car, ventilated",8
+VM,Freight,V,"Box car, ventilated",8
+VS,Freight,V,"Reefer car, produce ventilated",8
+XA,Freight,X,"Box car, auto",8
+XAB,Freight,X,"Box car, 10' doors",8
+XAF,Freight,X,"Box car, auto/furniture",8
+XAP,Freight,X,"Box car, Auto parts",0
+XAR,Freight,X,"Box car, Auto",8
+XC,Freight,X,"Box car, compartments",8
+XF,Freight,X,"Box car, furniture, food",8
+XI,Freight,X,"Box car, insulated/produce",8
+XL,Freight,X,"Box car, retaining devices",8
+XM,Freight,X,"Box car, general service",0
+XMC,Freight,X,"Box car, mult-compartments",8
+XMD,Freight,X,"Boxcar, double door",0
+XME,Freight,X,"Box car, wood lining",8
+XML,Freight,X,"Box car, w/loading devices",8
+XMP,Freight,X,"Box car, no auto parts",8
+XMR,Freight,X,"Box car, automobile",8
+XP,Freight,X,"Box car, single commodity",8
+XR,Freight,X,"Box car, automobile",8
+XT,Freight,X,"Box car, enclosed tank",8
+XU,Freight,X,"Box car, removable super",8
+XV,Freight,X,"Box car, ventilated/produce",8

@@ -218,45 +218,12 @@ class ScannerFragment : Fragment() {
                                     requireActivity().runOnUiThread {
 
                                         tvCount.text = "Scanned Cars: $scanCount"
-//                                        tvLastScan.text =
-//                                            "Last Scan: $value"
                                         tvLastScan.text =
                                             "Car: $carId  Dest: $destinationId"
-//                                        tvScannedCars.text = scannedCars.joinToString("\n")
                                         tvScannedCars.text =
                                             viewModel.scannedCars.joinToString("\n")
                                     }
                                 }
-//                                if (value != null) {
-//
-//                                    val parts = value.split(",")
-//
-//                                    if (parts.size == 2) {
-//
-//                                        val carId = parts[0]
-//                                        val destinationId = parts[1].toInt()
-//
-//                                        val scannedCar = ScannedCar(
-//                                            carId = carId,
-//                                            destinationId = destinationId,
-//                                            locationId = viewModel.currentLocationId,
-//                                            trainId = viewModel.activeTrainId ?: 0
-//                                        )
-//
-//                                        viewModel.scannedCars.add(scannedCar)
-//
-//                                        requireActivity().runOnUiThread {
-//
-//                                            tvCount.text =
-//                                                "Scanned Cars: ${viewModel.scannedCars.size}"
-//
-//                                            tvScannedCars.text =
-//                                                viewModel.scannedCars.joinToString("\n") {
-//                                                    it.carId
-//                                                }
-//                                        }
-//                                    }
-//                                }
 
                             }
 

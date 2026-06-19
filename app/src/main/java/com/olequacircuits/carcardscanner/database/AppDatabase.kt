@@ -4,10 +4,21 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Location::class],
+    entities = [
+        Location::class,
+        Train::class,
+        Car::class,
+        AARCode::class,
+        ScanRecord::class
+    ],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun locationDao(): LocationDao
+    abstract fun trainDao(): TrainDao
+    abstract fun carDao(): CarDao
+    abstract fun aarCodeDao(): AARCodeDao
+    abstract fun scanRecordDao(): ScanRecordDao
+
 }

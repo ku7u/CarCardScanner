@@ -3,11 +3,11 @@ package com.olequacircuits.carcardscanner.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "locations")
-data class Location(
+@Entity(tableName = "aarcodes")
+data class AARCode(
 
     @PrimaryKey
-    val locationId: Int,
+    val aar: String,
 
-    val name: String
+    val description: String
 )

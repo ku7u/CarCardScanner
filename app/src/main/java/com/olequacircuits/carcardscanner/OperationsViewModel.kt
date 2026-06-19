@@ -17,7 +17,6 @@ class OperationsViewModel : ViewModel() {
 
     // Cars scanned in this session
     val scannedCars = mutableListOf<String>()
-//    val scannedCars = mutableListOf<ScannedCar>()
 
     val scannedCarSet = mutableSetOf<String>()
 
