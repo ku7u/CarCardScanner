@@ -7,10 +7,54 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tvControlTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Train Control"
-        android:textSize="24sp"/>
+        android:textSize="24sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Train:" />
+
+    <Spinner
+        android:id="@+id/spTrain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Status: Not Scanning" />
+
+    <Button
+        android:id="@+id/btnStartScanning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Start Scanning" />
+
+    <Button
+        android:id="@+id/btnEndScanning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="End Scanning" />
+
+    <TextView
+        android:id="@+id/tvScanCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Cars Scanned: 0" />
+
+    <Button
+        android:id="@+id/btnGenerateSwitchlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Generate Switchlist" />
 
 </LinearLayout>

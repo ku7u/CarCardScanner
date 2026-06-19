@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import androidx.camera.core.ExperimentalGetImage
+import androidx.fragment.app.activityViewModels
 
 
 class ScannerFragment : Fragment() {
@@ -36,9 +37,10 @@ class ScannerFragment : Fragment() {
     private lateinit var tvScannedCars: TextView
     private lateinit var spLocation: Spinner
     private val scannedCars = mutableSetOf<String>()
-
+    private val viewModel: OperationsViewModel by activityViewModels()
     private lateinit var toneGenerator: ToneGenerator
     private lateinit var vibrator: Vibrator
+    private lateinit var tvTrain: TextView
 
     private var scanCount = 0
     private val locations = listOf(
@@ -102,6 +104,11 @@ class ScannerFragment : Fragment() {
                 100
             )
         }
+
+        tvTrain = view.findViewById(R.id.tvTrain)
+
+        tvTrain.text =
+            "Train: ${viewModel.activeTrainName ?: "None"}"
 
         toneGenerator =
             ToneGenerator(
@@ -174,10 +181,18 @@ class ScannerFragment : Fragment() {
                                     barcode.rawValue
 
                                 if (value != null &&
-                                    scannedCars.add(value)
+                                    viewModel.scannedCarSet.add(value)
                                 ) {
+                                    val qrParts = value.split(",")
+                                    val carId = qrParts[0]
+                                    val destinationId =
+                                        if (qrParts.size > 1)
+                                            qrParts[1]
+                                        else
+                                            ""
 
-                                    scanCount++
+                                    val scanCount = viewModel.scannedCars.size + 1
+                                    viewModel.scannedCars.add(value)
 
                                     toneGenerator.startTone(
                                         ToneGenerator.TONE_PROP_BEEP,
@@ -203,11 +218,46 @@ class ScannerFragment : Fragment() {
                                     requireActivity().runOnUiThread {
 
                                         tvCount.text = "Scanned Cars: $scanCount"
+//                                        tvLastScan.text =
+//                                            "Last Scan: $value"
                                         tvLastScan.text =
-                                            "Last Scan: $value"
-                                        tvScannedCars.text = scannedCars.joinToString("\n")
+                                            "Car: $carId  Dest: $destinationId"
+//                                        tvScannedCars.text = scannedCars.joinToString("\n")
+                                        tvScannedCars.text =
+                                            viewModel.scannedCars.joinToString("\n")
                                     }
                                 }
+//                                if (value != null) {
+//
+//                                    val parts = value.split(",")
+//
+//                                    if (parts.size == 2) {
+//
+//                                        val carId = parts[0]
+//                                        val destinationId = parts[1].toInt()
+//
+//                                        val scannedCar = ScannedCar(
+//                                            carId = carId,
+//                                            destinationId = destinationId,
+//                                            locationId = viewModel.currentLocationId,
+//                                            trainId = viewModel.activeTrainId ?: 0
+//                                        )
+//
+//                                        viewModel.scannedCars.add(scannedCar)
+//
+//                                        requireActivity().runOnUiThread {
+//
+//                                            tvCount.text =
+//                                                "Scanned Cars: ${viewModel.scannedCars.size}"
+//
+//                                            tvScannedCars.text =
+//                                                viewModel.scannedCars.joinToString("\n") {
+//                                                    it.carId
+//                                                }
+//                                        }
+//                                    }
+//                                }
+
                             }
 
                         }
