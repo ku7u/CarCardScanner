@@ -13,6 +13,12 @@ interface AARCodeDao {
     @Query("SELECT description FROM aarcodes WHERE aar = :aar")
     suspend fun getDescription(aar: String): String?
 
+    @Query("SELECT COUNT(*) FROM aarcodes")
+    suspend fun getCount(): Int
+
     @Insert
     suspend fun insert(aarCode: AARCode)
+
+    @Insert
+    suspend fun insertAll(codes: List<AARCode>)
 }

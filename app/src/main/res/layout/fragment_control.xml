@@ -57,4 +57,22 @@
         android:layout_marginTop="16dp"
         android:text="Generate Switchlist" />
 
+    <Button
+        android:id="@+id/btnTestDb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test DB"/>
+
+    <Button
+        android:id="@+id/btnImportAar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import AAR"/>
+
+    <Button
+        android:id="@+id/btnShowAARCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show AAR Count"/>
+
 </LinearLayout>
