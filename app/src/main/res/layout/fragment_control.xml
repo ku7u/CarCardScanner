@@ -87,4 +87,22 @@
         android:layout_height="wrap_content"
         android:text="Location Count"/>
 
+    <Button
+        android:id="@+id/btnImportCars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import Cars"/>
+
+    <Button
+        android:id="@+id/btnCarCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Car Count"/>
+
+    <Button
+        android:id="@+id/btnImportTrains"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import Trains"/>
+
 </LinearLayout>

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 
 @Dao
 interface CarDao {
@@ -15,7 +16,7 @@ interface CarDao {
     @Query("SELECT * FROM cars WHERE carId = :id")
     suspend fun getById(id: String): Car?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(car: Car)
 
     @Update
@@ -23,4 +24,10 @@ interface CarDao {
 
     @Delete
     suspend fun delete(car: Car)
+
+    @Query("SELECT COUNT(*) FROM cars")
+    suspend fun getCount(): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(cars: List<Car>)
 }

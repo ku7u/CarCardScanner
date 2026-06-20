@@ -26,6 +26,7 @@ import com.olequacircuits.carcardscanner.database.Location
 // for picker
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
+import com.olequacircuits.carcardscanner.database.Car
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -55,6 +56,26 @@ class ControlFragment : Fragment() {
 
             uri?.let {
                 importLocationsFromCsv(it)
+            }
+        }
+
+    private val carCsvPicker =
+        registerForActivityResult(
+            ActivityResultContracts.OpenDocument()
+        ) { uri ->
+
+            uri?.let {
+                importCarsFromCsv(it)
+            }
+        }
+
+    private val trainCsvPicker =
+        registerForActivityResult(
+            ActivityResultContracts.OpenDocument()
+        ) { uri ->
+
+            uri?.let {
+                importTrainsFromCsv(it)
             }
         }
 
@@ -89,6 +110,46 @@ class ControlFragment : Fragment() {
             view.findViewById<Button>(R.id.btnImportLocations)
         val btnLocationCount =
             view.findViewById<Button>(R.id.btnLocationCount)
+        val btnImportCars =
+            view.findViewById<Button>(R.id.btnImportCars)
+        val btnCarCount =
+            view.findViewById<Button>(R.id.btnCarCount)
+        val btnImportTrains =
+            view.findViewById<Button>(R.id.btnImportTrains)
+
+        btnImportTrains.setOnClickListener {
+
+            trainCsvPicker.launch(
+                arrayOf("text/*", "text/csv")
+            )
+        }
+
+        btnCarCount.setOnClickListener {
+
+            lifecycleScope.launch {
+
+                val count = withContext(Dispatchers.IO) {
+
+                    DatabaseProvider
+                        .getDatabase(requireContext())
+                        .carDao()
+                        .getCount()
+                }
+
+                Toast.makeText(
+                    requireContext(),
+                    "Cars = $count",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        btnImportCars.setOnClickListener {
+
+            carCsvPicker.launch(
+                arrayOf("text/*", "text/csv")
+            )
+        }
         btnLocationCount.setOnClickListener {
 
             lifecycleScope.launch {
@@ -107,49 +168,7 @@ class ControlFragment : Fragment() {
                 ).show()
             }
         }
-//        btnImportLocations.setOnClickListener {
-//
-//            lifecycleScope.launch {
-//
-//                val imported = withContext(Dispatchers.IO) {
-//
-//                    val db = DatabaseProvider.getDatabase(requireContext())
-//
-//                    val locations = mutableListOf<Location>()
-//
-//                    requireContext()
-//                        .assets
-//                        .open("locations.csv")
-//                        .bufferedReader()
-//                        .forEachLine { line ->
-//
-//                            if (line.isBlank()) return@forEachLine
-//
-//                            val parts = line.split(",")
-//
-//                            if (parts.size >= 2) {
-//
-//                                locations.add(
-//                                    Location(
-//                                        locationId = parts[0].trim().toInt(),
-//                                        name = parts[1].trim()
-//                                    )
-//                                )
-//                            }
-//                        }
-//
-//                    db.locationDao().insertAll(locations)
-//
-//                    locations.size
-//                }
-//
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Imported $imported locations",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//            }
-//        }
+
         btnImportLocations.setOnClickListener {
 
             locationCsvPicker.launch(
@@ -326,32 +345,29 @@ class ControlFragment : Fragment() {
 
                 requireContext()
                     .contentResolver
-                    .openInputStream(uri)
-                    ?.use { input ->
+                val lines =
+                    CsvImporter.readLines(
+                        requireContext(),
+                        uri
+                    )
 
-                        BufferedReader(
-                            InputStreamReader(input)
-                        ).forEachLine { line ->
+                for (line in lines) {
 
-                            if (line.isBlank())
-                                return@forEachLine
+                    val parts = line.split(",")
 
-                            val parts = line.split(",")
+                    if (parts.size >= 2) {
 
-                            if (parts.size >= 2) {
+                        locations.add(
+                            Location(
+                                locationId =
+                                    parts[0].trim().toInt(),
 
-                                locations.add(
-                                    Location(
-                                        locationId =
-                                            parts[0].trim().toInt(),
-
-                                        name =
-                                            parts[1].trim()
-                                    )
-                                )
-                            }
-                        }
+                                name =
+                                    parts[1].trim()
+                            )
+                        )
                     }
+                }
 
                 db.locationDao()
                     .insertAll(locations)
@@ -367,6 +383,103 @@ class ControlFragment : Fragment() {
             ).show()
         }
     }
+
+    private fun importCarsFromCsv(uri: Uri) {
+
+        lifecycleScope.launch {
+
+            val imported = withContext(Dispatchers.IO) {
+
+                val db =
+                    DatabaseProvider.getDatabase(requireContext())
+
+                val lines =
+                    CsvImporter.readLines(
+                        requireContext(),
+                        uri
+                    )
+
+                val cars = mutableListOf<Car>()
+
+                for (line in lines) {
+
+                    val parts = line.split(",")
+
+                    if (parts.size >= 5) {
+
+                        cars.add(
+                            Car(
+                                carId = parts[0].trim(),
+                                railroad = parts[1].trim(),
+                                carNumber = parts[2].trim(),
+                                aar = parts[3].trim(),
+                                color = parts[4].trim()
+                            )
+                        )
+                    }
+                }
+
+                db.carDao().insertAll(cars)
+
+                cars.size
+            }
+
+            Toast.makeText(
+                requireContext(),
+                "Imported $imported cars",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun importTrainsFromCsv(uri: Uri) {
+
+        lifecycleScope.launch {
+
+            val imported = withContext(Dispatchers.IO) {
+
+                val db =
+                    DatabaseProvider.getDatabase(requireContext())
+
+                val lines =
+                    CsvImporter.readLines(
+                        requireContext(),
+                        uri
+                    )
+
+                val trains = mutableListOf<Train>()
+
+                for (line in lines) {
+
+                    val parts = line.split(",")
+
+                    if (parts.size >= 2) {
+
+                        trains.add(
+                            Train(
+                                trainId =
+                                    parts[0].trim().toInt(),
+
+                                name =
+                                    parts[1].trim()
+                            )
+                        )
+                    }
+                }
+
+                db.trainDao().insertAll(trains)
+
+                trains.size
+            }
+
+            Toast.makeText(
+                requireContext(),
+                "Imported $imported trains",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     private fun parseCsvLine(line: String): List<String> {
 
         val result = mutableListOf<String>()
