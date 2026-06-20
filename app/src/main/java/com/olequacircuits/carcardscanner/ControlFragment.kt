@@ -21,6 +21,14 @@ import kotlinx.coroutines.withContext
 import com.olequacircuits.carcardscanner.database.DatabaseProvider
 import com.olequacircuits.carcardscanner.database.Train
 import com.olequacircuits.carcardscanner.database.AARCode
+import com.olequacircuits.carcardscanner.database.Location
+
+// for picker
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
 
 class ControlFragment : Fragment() {
 
@@ -39,6 +47,16 @@ class ControlFragment : Fragment() {
         "Everett Switcher",
         "Seattle Turn"
     )
+
+    private val locationCsvPicker =
+        registerForActivityResult(
+            ActivityResultContracts.OpenDocument()
+        ) { uri: Uri? ->
+
+            uri?.let {
+                importLocationsFromCsv(it)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,10 +79,83 @@ class ControlFragment : Fragment() {
             savedInstanceState
         )
 
+        // TODO: remove this
+        // DEVELOPMENT TEST BUTTONS
+        // Remove/rework before release
         val btnTestDb = view.findViewById<Button>(R.id.btnTestDb)
         val btnImportAar = view.findViewById<Button>(R.id.btnImportAar)
         val btnShowAarCount = view.findViewById<Button>(R.id.btnShowAARCount)
+        val btnImportLocations =
+            view.findViewById<Button>(R.id.btnImportLocations)
+        val btnLocationCount =
+            view.findViewById<Button>(R.id.btnLocationCount)
+        btnLocationCount.setOnClickListener {
 
+            lifecycleScope.launch {
+
+                val count = withContext(Dispatchers.IO) {
+
+                    val db = DatabaseProvider.getDatabase(requireContext())
+
+                    db.locationDao().getCount()
+                }
+
+                Toast.makeText(
+                    requireContext(),
+                    "Locations = $count",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+//        btnImportLocations.setOnClickListener {
+//
+//            lifecycleScope.launch {
+//
+//                val imported = withContext(Dispatchers.IO) {
+//
+//                    val db = DatabaseProvider.getDatabase(requireContext())
+//
+//                    val locations = mutableListOf<Location>()
+//
+//                    requireContext()
+//                        .assets
+//                        .open("locations.csv")
+//                        .bufferedReader()
+//                        .forEachLine { line ->
+//
+//                            if (line.isBlank()) return@forEachLine
+//
+//                            val parts = line.split(",")
+//
+//                            if (parts.size >= 2) {
+//
+//                                locations.add(
+//                                    Location(
+//                                        locationId = parts[0].trim().toInt(),
+//                                        name = parts[1].trim()
+//                                    )
+//                                )
+//                            }
+//                        }
+//
+//                    db.locationDao().insertAll(locations)
+//
+//                    locations.size
+//                }
+//
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Imported $imported locations",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+//        }
+        btnImportLocations.setOnClickListener {
+
+            locationCsvPicker.launch(
+                arrayOf("text/*", "text/csv")
+            )
+        }
         btnTestDb.setOnClickListener {
 
             lifecycleScope.launch {
@@ -150,6 +241,7 @@ class ControlFragment : Fragment() {
                 ).show()
             }
         }
+        // TODO: end of temporary removal block
 
         spTrain = view.findViewById(R.id.spTrain)
 
@@ -221,6 +313,60 @@ class ControlFragment : Fragment() {
         }
     }
 
+    private fun importLocationsFromCsv(uri: Uri) {
+
+        lifecycleScope.launch {
+
+            val imported = withContext(Dispatchers.IO) {
+
+                val db =
+                    DatabaseProvider.getDatabase(requireContext())
+
+                val locations = mutableListOf<Location>()
+
+                requireContext()
+                    .contentResolver
+                    .openInputStream(uri)
+                    ?.use { input ->
+
+                        BufferedReader(
+                            InputStreamReader(input)
+                        ).forEachLine { line ->
+
+                            if (line.isBlank())
+                                return@forEachLine
+
+                            val parts = line.split(",")
+
+                            if (parts.size >= 2) {
+
+                                locations.add(
+                                    Location(
+                                        locationId =
+                                            parts[0].trim().toInt(),
+
+                                        name =
+                                            parts[1].trim()
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                db.locationDao()
+                    .insertAll(locations)
+
+                locations.size
+            }
+
+
+            Toast.makeText(
+                requireContext(),
+                "Imported $imported locations",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
     private fun parseCsvLine(line: String): List<String> {
 
         val result = mutableListOf<String>()

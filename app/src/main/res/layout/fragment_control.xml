@@ -75,4 +75,16 @@
         android:layout_height="wrap_content"
         android:text="Show AAR Count"/>
 
+    <Button
+        android:id="@+id/btnImportLocations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import Locations"/>
+
+    <Button
+        android:id="@+id/btnLocationCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location Count"/>
+
 </LinearLayout>
