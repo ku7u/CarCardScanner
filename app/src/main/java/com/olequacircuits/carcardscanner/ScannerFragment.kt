@@ -27,6 +27,12 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import androidx.camera.core.ExperimentalGetImage
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import com.olequacircuits.carcardscanner.database.DatabaseProvider
+import com.olequacircuits.carcardscanner.database.ScanRecord
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ScannerFragment : Fragment() {
@@ -193,6 +199,7 @@ class ScannerFragment : Fragment() {
 
                                     val scanCount = viewModel.scannedCars.size + 1
                                     viewModel.scannedCars.add(value)
+                                    saveScanRecord(value)
 
                                     toneGenerator.startTone(
                                         ToneGenerator.TONE_PROP_BEEP,
@@ -276,6 +283,54 @@ class ScannerFragment : Fragment() {
             grantResults[0] == PackageManager.PERMISSION_GRANTED
         ) {
             startCamera()
+        }
+    }
+
+    private fun saveScanRecord(qrText: String) {
+        val trainId =
+            viewModel.activeTrainId ?: return
+
+        val parts = qrText.split(",")
+
+        if (parts.size < 2)
+            return
+
+        val carId =
+            parts[0].trim()
+
+        val destinationId =
+            parts[1].trim().toIntOrNull()
+                ?: return
+
+        lifecycleScope.launch {
+
+            withContext(Dispatchers.IO) {
+
+                val db =
+                    DatabaseProvider.getDatabase(
+                        requireContext()
+                    )
+
+                db.scanRecordDao().insert(
+
+                    ScanRecord(
+
+                        carId = carId,
+
+                        destinationId =
+                            destinationId,
+
+                        locationId =
+                            viewModel.currentLocationId,
+
+                        trainId = trainId,
+//                            viewModel.activeTrainId,
+
+                        timestamp =
+                            System.currentTimeMillis()
+                    )
+                )
+            }
         }
     }
 }

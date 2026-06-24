@@ -16,7 +16,10 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "carcardscanner.db"
-            ).build()
+            )
+                // TODO: this should be changed to false for production per chatgpt
+                .fallbackToDestructiveMigration(true)
+                .build()
 
             INSTANCE = instance
 

@@ -9,9 +9,10 @@ import androidx.room.RoomDatabase
         Train::class,
         Car::class,
         AARCode::class,
-        ScanRecord::class
+        ScanRecord::class,
+        Waybill::class
     ],
-    version = 1
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -20,5 +21,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun carDao(): CarDao
     abstract fun aarCodeDao(): AARCodeDao
     abstract fun scanRecordDao(): ScanRecordDao
+    abstract fun waybillDao(): WaybillDao
 
 }

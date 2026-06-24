@@ -27,6 +27,7 @@ import com.olequacircuits.carcardscanner.database.Location
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.olequacircuits.carcardscanner.database.Car
+import com.olequacircuits.carcardscanner.database.Waybill
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -79,6 +80,16 @@ class ControlFragment : Fragment() {
             }
         }
 
+    private val waybillCsvPicker =
+        registerForActivityResult(
+            ActivityResultContracts.OpenDocument()
+        ) { uri ->
+
+            uri?.let {
+                importWaybillsFromCsv(it)
+            }
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -116,6 +127,15 @@ class ControlFragment : Fragment() {
             view.findViewById<Button>(R.id.btnCarCount)
         val btnImportTrains =
             view.findViewById<Button>(R.id.btnImportTrains)
+        val btnImportWaybills =
+            view.findViewById<Button>(R.id.btnImportWaybills)
+
+        btnImportWaybills.setOnClickListener {
+
+            waybillCsvPicker.launch(
+                arrayOf("text/*", "text/csv")
+            )
+        }
 
         btnImportTrains.setOnClickListener {
 
@@ -475,6 +495,69 @@ class ControlFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 "Imported $imported trains",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun importWaybillsFromCsv(uri: Uri) {
+
+        lifecycleScope.launch {
+
+            val imported = withContext(Dispatchers.IO) {
+
+                val db =
+                    DatabaseProvider.getDatabase(
+                        requireContext()
+                    )
+
+                val lines =
+                    CsvImporter.readLines(
+                        requireContext(),
+                        uri
+                    )
+
+                val waybills =
+                    mutableListOf<Waybill>()
+
+                for (line in lines) {
+
+                    val parts = line.split(",")
+
+                    if (parts.size >= 3) {
+
+                        waybills.add(
+
+                            Waybill(
+
+                                waybillId =
+                                    parts[0].trim().toInt(),
+
+                                carId =
+                                    parts[1].trim(),
+
+                                destinationId =
+                                    parts[2].trim().toInt(),
+
+                                loadStatus =
+                                    if (parts.size >= 4)
+                                        parts[3].trim()
+                                    else
+                                        null
+                            )
+                        )
+                    }
+                }
+
+                db.waybillDao()
+                    .insertAll(waybills)
+
+                waybills.size
+            }
+
+            Toast.makeText(
+                requireContext(),
+                "Imported $imported waybills",
                 Toast.LENGTH_LONG
             ).show()
         }
