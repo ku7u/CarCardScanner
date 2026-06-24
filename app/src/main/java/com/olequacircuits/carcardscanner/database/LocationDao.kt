@@ -7,6 +7,8 @@ import androidx.room.Query
 
 @Dao
 interface LocationDao {
+    @Query("SELECT * FROM locations WHERE locationId = :id")
+    suspend fun getById(id: Int): Location?
     @Query("SELECT * FROM locations ORDER BY locationId")
     suspend fun getAll(): List<Location>
 

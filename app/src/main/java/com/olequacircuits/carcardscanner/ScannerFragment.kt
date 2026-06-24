@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -49,6 +50,8 @@ class ScannerFragment : Fragment() {
     private lateinit var tvTrain: TextView
 
     private var scanCount = 0
+    private var lastScan: String? = null
+    private var lastScanTime = 0L
     private val locations = listOf(
         "Tacoma Yard (101)",
         "Everett Paper Mill (205)",
@@ -185,6 +188,166 @@ class ScannerFragment : Fragment() {
 
                                 val value =
                                     barcode.rawValue
+
+                                val now = System.currentTimeMillis()
+
+//                                if (value != lastScan || now - lastScanTime >= 3000) {
+                                if (value != null &&
+                                    (value != lastScan || now - lastScanTime >= 3000)
+                                ) {
+                                    lastScan = value
+                                    lastScanTime = now
+
+                                    val parts = value?.split(",")
+
+                                    if (parts != null && parts.size >= 2) {
+
+                                        when (parts[0].trim().uppercase()) {
+
+                                            "LOC" -> {
+
+                                                val locationId =
+                                                    parts[1].trim().toIntOrNull()
+
+                                                if (locationId == null) {
+
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Invalid location QR",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                } else {
+
+                                                    lifecycleScope.launch {
+
+                                                        val db =
+                                                            DatabaseProvider.getDatabase(
+                                                                requireContext()
+                                                            )
+
+                                                        val location =
+                                                            withContext(Dispatchers.IO) {
+
+                                                                db.locationDao()
+                                                                    .getById(locationId)
+                                                            }
+
+                                                        if (location != null) {
+
+                                                            viewModel.currentLocationId =
+                                                                location.locationId
+
+                                                            viewModel.currentLocationName =
+                                                                location.name
+
+//                                                        Toast.makeText(
+//                                                            requireContext(),
+//                                                            "Location set to ${location.name}",
+//                                                            Toast.LENGTH_SHORT
+//                                                        ).show()
+                                                            Log.d(
+                                                                "SCAN",
+                                                                "Location=${viewModel.currentLocationId} ${viewModel.currentLocationName}"
+                                                            )
+
+//                                                        Log.d(
+//                                                            "SCAN",
+//                                                            "Current location = ${location.name}"
+//                                                        )
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            "WB" -> {
+
+                                                val waybillId =
+                                                    parts[1].trim().toIntOrNull()
+
+                                                if (waybillId == null) {
+
+                                                    Log.d(
+                                                        "SCAN",
+                                                        "Invalid waybill QR"
+                                                    )
+
+                                                } else {
+
+                                                    lifecycleScope.launch {
+
+                                                        val db =
+                                                            DatabaseProvider.getDatabase(
+                                                                requireContext()
+                                                            )
+
+                                                        val waybill =
+                                                            withContext(Dispatchers.IO) {
+
+                                                                db.waybillDao()
+                                                                    .getById(waybillId)
+                                                            }
+
+                                                        if (waybill != null) {
+
+//                                                        Log.d(
+//                                                            "SCAN",
+//                                                            "Waybill ${waybill.waybillId} car=${waybill.carId} dest=${waybill.destinationId}"
+//                                                        )
+                                                            val trainId =
+                                                                viewModel.activeTrainId
+
+                                                            if (trainId == null) {
+
+                                                                Log.d(
+                                                                    "SCAN",
+                                                                    "No active train selected"
+                                                                )
+
+                                                            } else {
+
+                                                                val scanRecord = ScanRecord(
+
+                                                                    carId = waybill.carId,
+
+                                                                    locationId =
+                                                                        viewModel.currentLocationId,
+
+                                                                    destinationId =
+                                                                        waybill.destinationId,
+
+                                                                    trainId =
+                                                                        trainId,
+
+                                                                    timestamp =
+                                                                        System.currentTimeMillis()
+                                                                )
+
+                                                                withContext(Dispatchers.IO) {
+
+                                                                    db.scanRecordDao()
+                                                                        .insert(scanRecord)
+                                                                }
+
+                                                                Log.d(
+                                                                    "SCAN",
+                                                                    "Recorded ${waybill.carId}"
+                                                                )
+                                                            }
+                                                        } else {
+
+                                                            Log.d(
+                                                                "SCAN",
+                                                                "Waybill not found: $waybillId"
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
 
                                 if (value != null &&
                                     viewModel.scannedCarSet.add(value)

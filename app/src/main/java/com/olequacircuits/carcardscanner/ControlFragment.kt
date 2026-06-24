@@ -25,6 +25,8 @@ import com.olequacircuits.carcardscanner.database.Location
 
 // for picker
 import android.net.Uri
+import android.util.Log
+import android.widget.AdapterView
 import androidx.activity.result.contract.ActivityResultContracts
 import com.olequacircuits.carcardscanner.database.Car
 import com.olequacircuits.carcardscanner.database.Waybill
@@ -44,11 +46,12 @@ class ControlFragment : Fragment() {
 
     private val viewModel: OperationsViewModel by activityViewModels()
 
-    private val trains = listOf(
-        "Tacoma Local",
-        "Everett Switcher",
-        "Seattle Turn"
-    )
+//    private val trains = listOf(
+//        "Tacoma Local",
+//        "Everett Switcher",
+//        "Seattle Turn"
+//    )
+    private var trains = listOf<Train>()
 
     private val locationCsvPicker =
         registerForActivityResult(
@@ -195,6 +198,7 @@ class ControlFragment : Fragment() {
                 arrayOf("text/*", "text/csv")
             )
         }
+
         btnTestDb.setOnClickListener {
 
             lifecycleScope.launch {
@@ -220,6 +224,7 @@ class ControlFragment : Fragment() {
                     .show()
             }
         }
+
         btnImportAar.setOnClickListener {
 
             lifecycleScope.launch {
@@ -299,17 +304,67 @@ class ControlFragment : Fragment() {
         btnGenerateSwitchlist =
             view.findViewById(R.id.btnGenerateSwitchlist)
 
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            trains
-        )
 
-        adapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item
-        )
+        lifecycleScope.launch {
 
-        spTrain.adapter = adapter
+            val db =
+                DatabaseProvider.getDatabase(
+                    requireContext()
+                )
+
+            val trains =
+                withContext(Dispatchers.IO) {
+                    db.trainDao().getAll()
+                }
+
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                trains
+            )
+
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
+
+            spTrain.adapter = adapter
+
+            spTrain.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+
+                    override fun onItemSelected(
+                        parent: AdapterView<*>,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+
+                        val train =
+                            trains[position]
+
+                        viewModel.activeTrainId =
+                            train.trainId
+
+                        viewModel.activeTrainName =
+                            train.name
+
+                        Log.d(
+                            "TRAIN",
+                            "Selected train ${train.trainId} ${train.name}"
+                        )
+                    }
+
+                    override fun onNothingSelected(
+                        parent: AdapterView<*>
+                    ) {
+                        viewModel.activeTrainId = null
+                        viewModel.activeTrainName = null
+                    }
+                }
+        }
+
+
+
 
         btnStartScanning.setOnClickListener {
 

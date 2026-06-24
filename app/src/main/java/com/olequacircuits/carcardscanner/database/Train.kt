@@ -10,4 +10,9 @@ data class Train(
     val trainId: Int,
 
     val name: String
-)
+
+) {
+    override fun toString(): String {
+        return name
+    }
+}
