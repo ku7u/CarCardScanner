@@ -418,15 +418,16 @@ class ControlFragment : Fragment() {
 
                 val locations = mutableListOf<Location>()
 
-                requireContext()
-                    .contentResolver
                 val lines =
                     CsvImporter.readLines(
                         requireContext(),
                         uri
                     )
 
-                for (line in lines) {
+                // Skip header row
+                for (line in lines.drop(1)) {
+
+                    if (line.isBlank()) continue
 
                     val parts = line.split(",")
 
@@ -449,7 +450,6 @@ class ControlFragment : Fragment() {
 
                 locations.size
             }
-
 
             Toast.makeText(
                 requireContext(),

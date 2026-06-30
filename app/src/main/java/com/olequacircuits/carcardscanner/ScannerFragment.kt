@@ -188,7 +188,7 @@ class ScannerFragment : Fragment() {
 
                                 val value =
                                     barcode.rawValue
-
+                                Log.d("SCAN", "QR = '$value'")
                                 val now = System.currentTimeMillis()
 
 //                                if (value != lastScan || now - lastScanTime >= 3000) {
