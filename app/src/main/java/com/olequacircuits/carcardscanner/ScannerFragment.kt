@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -42,7 +43,7 @@ class ScannerFragment : Fragment() {
     private lateinit var tvCount: TextView
     private lateinit var tvLastScan: TextView
     private lateinit var tvScannedCars: TextView
-    private lateinit var spLocation: Spinner
+//    private lateinit var spLocation: Spinner
     private val scannedCars = mutableSetOf<String>()
     private val viewModel: OperationsViewModel by activityViewModels()
     private lateinit var toneGenerator: ToneGenerator
@@ -57,6 +58,23 @@ class ScannerFragment : Fragment() {
         "Everett Paper Mill (205)",
         "Seattle Fuel (330)"
     )
+    private lateinit var tvCurrentLocation: TextView
+
+    private val cameraPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+
+            if (granted) {
+                startCamera()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Camera permission is required for scanning",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,38 +99,24 @@ class ScannerFragment : Fragment() {
         tvLastScan = view.findViewById(R.id.tvLastScan)
         tvScannedCars =
             view.findViewById(R.id.tvScannedCars)
-        spLocation = view.findViewById(R.id.spLocation)
 
-        // initialize spinner
-        // initialize camera
-        // initialize scanner
-        val spinner = view.findViewById<Spinner>(R.id.spLocation)
+        if (viewModel.scanSessionActive) {
 
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            locations
-
-        )
-
-        adapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item
-        )
-
-        spinner.adapter = adapter
-//        startCamera()
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            startCamera()
-        } else {
-            requestPermissions(
-                arrayOf(Manifest.permission.CAMERA),
-                100
-            )
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                startCamera()
+            } else {
+                cameraPermissionLauncher.launch(
+                    Manifest.permission.CAMERA
+                )
+            }
         }
+
+        tvCurrentLocation =
+            view.findViewById<TextView>(R.id.tvCurrentLocation)
 
         tvTrain = view.findViewById(R.id.tvTrain)
 
@@ -205,9 +209,10 @@ class ScannerFragment : Fragment() {
                                         when (parts[0].trim().uppercase()) {
 
                                             "LOC" -> {
-
+                                                Log.d("SCAN", "Processing location QR")
                                                 val locationId =
                                                     parts[1].trim().toIntOrNull()
+                                                Log.d("SCAN", "locationId = $locationId")
 
                                                 if (locationId == null) {
 
@@ -232,7 +237,11 @@ class ScannerFragment : Fragment() {
                                                                 db.locationDao()
                                                                     .getById(locationId)
                                                             }
-
+                                                        Log.d("SCAN", "Location lookup complete")
+                                                        Log.d(
+                                                            "SCAN",
+                                                            "Lookup result = $location"
+                                                        )
                                                         if (location != null) {
 
                                                             viewModel.currentLocationId =
@@ -240,6 +249,9 @@ class ScannerFragment : Fragment() {
 
                                                             viewModel.currentLocationName =
                                                                 location.name
+
+                                                            tvCurrentLocation.text =
+                                                                "Current Location: ${location.name}"
 
 //                                                        Toast.makeText(
 //                                                            requireContext(),
@@ -283,7 +295,6 @@ class ScannerFragment : Fragment() {
 
                                                         val waybill =
                                                             withContext(Dispatchers.IO) {
-
                                                                 db.waybillDao()
                                                                     .getById(waybillId)
                                                             }

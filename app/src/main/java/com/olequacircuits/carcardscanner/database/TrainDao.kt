@@ -7,8 +7,11 @@ import androidx.room.Query
 
 @Dao
 interface TrainDao {
-    @Query("SELECT * FROM trains ORDER BY trainId")
+    @Query("SELECT * FROM trains ORDER BY name")
     suspend fun getAll(): List<Train>
+
+    @Query("SELECT * FROM trains WHERE name = :name")
+    suspend fun getByName(name: String): Train?
 
     @Query("SELECT COUNT(*) FROM trains")
     suspend fun getCount(): Int

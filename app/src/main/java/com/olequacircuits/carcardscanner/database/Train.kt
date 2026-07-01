@@ -1,18 +1,19 @@
 package com.olequacircuits.carcardscanner.database
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "trains")
+@Entity(
+    tableName = "trains",
+    indices = [
+        Index(value = ["name"], unique = true)
+    ]
+)
 data class Train(
 
-    @PrimaryKey
-    val trainId: Int,
+    @PrimaryKey(autoGenerate = true)
+    val trainId: Int = 0,
 
     val name: String
-
-) {
-    override fun toString(): String {
-        return name
-    }
-}
+)

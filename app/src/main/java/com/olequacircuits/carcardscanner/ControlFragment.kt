@@ -133,6 +133,13 @@ class ControlFragment : Fragment() {
         val btnImportWaybills =
             view.findViewById<Button>(R.id.btnImportWaybills)
 
+        lifecycleScope.launch {
+
+            withContext(Dispatchers.IO) {
+                importAarCodesIfNeeded()
+            }
+        }
+
         btnImportWaybills.setOnClickListener {
 
             waybillCsvPicker.launch(
@@ -173,6 +180,7 @@ class ControlFragment : Fragment() {
                 arrayOf("text/*", "text/csv")
             )
         }
+
         btnLocationCount.setOnClickListener {
 
             lifecycleScope.launch {
@@ -229,44 +237,18 @@ class ControlFragment : Fragment() {
 
             lifecycleScope.launch {
 
-                val imported = withContext(Dispatchers.IO) {
-
-                    val db = DatabaseProvider.getDatabase(requireContext())
-
-                    val codes = mutableListOf<AARCode>()
-
-                    requireContext().assets
-                        .open("aar_codes.csv")
-                        .bufferedReader()
-                        .forEachLine { line ->
-
-                            if (line.isBlank()) return@forEachLine
-
-                            val fields = parseCsvLine(line)
-
-                            if (fields.size >= 4) {
-
-                                codes.add(
-                                    AARCode(
-                                        aar = fields[0].trim(),
-                                        description = fields[3].trim()
-                                    )
-                                )
-                            }
-                        }
-
-                    db.aarCodeDao().insertAll(codes)
-
-                    codes.size
+                withContext(Dispatchers.IO) {
+                    importAarCodesIfNeeded()
                 }
 
                 Toast.makeText(
                     requireContext(),
-                    "Imported $imported AAR codes",
+                    "AAR codes loaded",
                     Toast.LENGTH_LONG
                 ).show()
             }
         }
+
         btnShowAarCount.setOnClickListener {
 
             lifecycleScope.launch {
@@ -316,7 +298,7 @@ class ControlFragment : Fragment() {
                 withContext(Dispatchers.IO) {
                     db.trainDao().getAll()
                 }
-
+            Log.d("TRAIN", "Trains loaded: ${trains.size} $trains")
             val adapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
@@ -340,13 +322,10 @@ class ControlFragment : Fragment() {
                     ) {
 
                         val train =
-                            trains[position]
+                            parent.getItemAtPosition(position) as Train
 
-                        viewModel.activeTrainId =
-                            train.trainId
-
-                        viewModel.activeTrainName =
-                            train.name
+                        viewModel.activeTrainId = train.trainId
+                        viewModel.activeTrainName = train.name
 
                         Log.d(
                             "TRAIN",
@@ -367,6 +346,16 @@ class ControlFragment : Fragment() {
 
 
         btnStartScanning.setOnClickListener {
+            if (viewModel.activeTrainId == null) {
+
+                Toast.makeText(
+                    requireContext(),
+                    "Select a train first",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
 
             viewModel.activeTrainName =
                 spTrain.selectedItem.toString()
@@ -406,6 +395,45 @@ class ControlFragment : Fragment() {
             tvStatus.text = "Status: Not Scanning"
         }
     }
+
+    private suspend fun importAarCodesIfNeeded() {
+
+        val db =
+            DatabaseProvider.getDatabase(requireContext())
+
+        val existing =
+            db.aarCodeDao().getCount()
+
+        if (existing > 0) {
+            return
+        }
+
+        val codes = mutableListOf<AARCode>()
+
+        requireContext().assets
+            .open("aar_codes.csv")
+            .bufferedReader()
+            .forEachLine { line ->
+
+                if (line.isBlank()) return@forEachLine
+
+                val fields = parseCsvLine(line)
+
+                if (fields.size >= 4) {
+
+                    codes.add(
+                        AARCode(
+                            aar = fields[0].trim(),
+                            description = fields[3].trim()
+                        )
+                    )
+                }
+            }
+
+        db.aarCodeDao()
+            .insertAll(codes)
+    }
+
 
     private fun importLocationsFromCsv(uri: Uri) {
 
@@ -459,11 +487,12 @@ class ControlFragment : Fragment() {
         }
     }
 
+
     private fun importCarsFromCsv(uri: Uri) {
 
         lifecycleScope.launch {
-
-            val imported = withContext(Dispatchers.IO) {
+            var skipped = 0
+            val result = withContext(Dispatchers.IO) {
 
                 val db =
                     DatabaseProvider.getDatabase(requireContext())
@@ -476,32 +505,49 @@ class ControlFragment : Fragment() {
 
                 val cars = mutableListOf<Car>()
 
-                for (line in lines) {
+                // Skip header row
+                for (line in lines.drop(1)) {
+
+                    if (line.isBlank()) continue
 
                     val parts = line.split(",")
 
                     if (parts.size >= 5) {
+                        val roadname = parts[0].trim()
+                        val roadnum  = parts[1].trim()
+
+                        if (roadname.isEmpty() || roadnum.isEmpty()) {
+                            skipped++
+                            Log.w("IMPORT", "Skipping invalid car row: $line")
+                            continue
+                        }
 
                         cars.add(
                             Car(
-                                carId = parts[0].trim(),
-                                railroad = parts[1].trim(),
-                                carNumber = parts[2].trim(),
-                                aar = parts[3].trim(),
-                                color = parts[4].trim()
+                                roadname = roadname,
+                                roadnum = roadnum,
+
+                                aarcode =
+                                    parts[2].trim(),
+
+                                length =
+                                    parts[3].trim(),
+
+                                color =
+                                    parts[4].trim()
                             )
                         )
                     }
                 }
 
-                db.carDao().insertAll(cars)
-
-                cars.size
+                db.carDao()
+                    .insertAll(cars)
+                Pair(cars.size, skipped)
             }
 
             Toast.makeText(
                 requireContext(),
-                "Imported $imported cars",
+                "Imported ${result.first} cars, skipped ${result.second}",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -524,19 +570,16 @@ class ControlFragment : Fragment() {
 
                 val trains = mutableListOf<Train>()
 
-                for (line in lines) {
+                // Skip header row
+                for (line in lines.drop(1)) {
 
-                    val parts = line.split(",")
+                    val name = line.trim()
 
-                    if (parts.size >= 2) {
+                    if (name.isNotEmpty()) {
 
                         trains.add(
                             Train(
-                                trainId =
-                                    parts[0].trim().toInt(),
-
-                                name =
-                                    parts[1].trim()
+                                name = name
                             )
                         )
                     }
@@ -546,6 +589,8 @@ class ControlFragment : Fragment() {
 
                 trains.size
             }
+
+            loadTrains()
 
             Toast.makeText(
                 requireContext(),
@@ -615,6 +660,32 @@ class ControlFragment : Fragment() {
                 "Imported $imported waybills",
                 Toast.LENGTH_LONG
             ).show()
+        }
+    }
+
+    private fun loadTrains() {
+
+        lifecycleScope.launch {
+
+            val db =
+                DatabaseProvider.getDatabase(requireContext())
+
+            val trains =
+                withContext(Dispatchers.IO) {
+                    db.trainDao().getAll()
+                }
+
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                trains
+            )
+
+            adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
+
+            spTrain.adapter = adapter
         }
     }
 
